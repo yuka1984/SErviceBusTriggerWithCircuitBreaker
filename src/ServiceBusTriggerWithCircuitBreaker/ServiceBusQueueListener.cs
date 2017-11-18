@@ -12,10 +12,10 @@ namespace ServiceBusTriggerWithCircuitBreaker
 {
     public class ServiceBusQueueListener : IListener
     {
-        private static readonly int breakErrorSpan = 60000;
-        private static readonly int breakErrorCount = 5;
-        private static readonly int minOpenTime = 60000;
-        private static readonly int maxOpenTime = 300000;
+        private readonly int breakErrorSpan = 60000;
+        private readonly int breakErrorCount = 5;
+        private readonly int minOpenTime = 60000;
+        private readonly int maxOpenTime = 300000;
         
 
         private object lockObj = new object();
@@ -33,7 +33,12 @@ namespace ServiceBusTriggerWithCircuitBreaker
         public ServiceBusQueueListener(ServiceBusQueueTriggerAttribute attribute, ServiceBusTriggerExecutor executor)
             : this(new Func<IQueueClient>(()=> new QueueClient(attribute.Connection, attribute.QueueName, ReceiveMode.PeekLock, RetryPolicy.Default)), executor)
         {
+            breakErrorCount = attribute.BreakErrorCount;
+            breakErrorSpan = attribute.BreakErrorSpan;
+            minOpenTime = attribute.MinOpenTime;
+            maxOpenTime = attribute.MaxOpenTime;
         }
+
 
         public ServiceBusQueueListener(Func<IQueueClient> queueClientFunc, ServiceBusTriggerExecutor executor)
         {
