@@ -161,9 +161,10 @@ namespace ServiceBusTriggerWithCircuitBreaker
 
                             Task.Delay(delayTime).ContinueWith(task =>
                             {
+                                _cancellationTokenSource.Token.ThrowIfCancellationRequested();
                                 errorCount = 0;
                                 firstFaultTime = null;
-                                StartAsync(new CancellationToken());
+                                StartAsync(_cancellationTokenSource.Token);
                             });
                         }
                     }
